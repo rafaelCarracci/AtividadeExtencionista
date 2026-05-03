@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Atividade Extensionista – Segurança na Internet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --border: #e8e5df;
+    --text: #1a1a18;
+    --muted: #7a7870;
+    --accent: #1d4ed8;
+    --accent-light: #eff3ff;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --warning: #d97706;
+    --ink: #1a1a18;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f0f0e; --surface: #1a1a18; --border: #2e2e2b;
+      --text: #e8e5df; --muted: #7a7870; --accent: #4f83f7;
+      --accent-light: #1a2340; --danger: #f87171; --success: #4ade80;
+      --warning: #fbbf24; --ink: #f5f3ee;
+    }
+  }
+  [data-theme="dark"] {
+    --bg: #0f0f0e; --surface: #1a1a18; --border: #2e2e2b;
+    --text: #e8e5df; --muted: #7a7870; --accent: #4f83f7;
+    --accent-light: #1a2340; --danger: #f87171; --success: #4ade80;
+    --warning: #fbbf24; --ink: #f5f3ee;
+  }
+  [data-theme="light"] {
+    --bg: #f7f6f2; --surface: #ffffff; --border: #e8e5df;
+    --text: #1a1a18; --muted: #7a7870; --accent: #1d4ed8;
+    --accent-light: #eff3ff; --danger: #dc2626; --success: #16a34a;
+    --warning: #d97706; --ink: #1a1a18;
+  }
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.2);
+    cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .15s;
+    flex-shrink: 0;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #1d4ed8;
+    backdrop-filter: blur(12px);
+    border-bottom: none;
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand { font-family: 'DM Serif Display', serif; font-size: 1rem; color: #ffffff; letter-spacing: -0.02em; font-weight: 700; }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color .2s; }
+  .nav-links a:hover { color: #ffffff; }
+
+  /* EQUIPE */
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+  .team-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.75rem 1.4rem;
+    text-align: center; transition: transform .2s, box-shadow .2s;
+  }
+  .team-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,.07); }
+  .team-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 1.5rem;
+    color: white; margin: 0 auto 1rem; letter-spacing: -0.02em;
+  }
+  .team-name { font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.3rem; }
+  .team-role {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.78rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 100px;
+  }
+  .role-comms { background: #eff3ff; color: #1d4ed8; }
+  .role-tech  { background: #f0fdf4; color: #16a34a; }
+
+  /* HERO */
+  .hero {
+    padding: 5rem 2rem 4rem;
+    max-width: 860px; margin: 0 auto;
+    text-align: center;
+  }
+  .hero-tag {
+    display: inline-block; background: var(--accent-light); color: var(--accent);
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15; color: var(--ink);
+    letter-spacing: -0.03em; margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p { color: var(--muted); max-width: 560px; margin: 0 auto 2rem; font-size: 1rem; }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+    padding-top: 2rem; border-top: 1px solid var(--border);
+  }
+  .hero-stat-num { font-family: 'DM Serif Display', serif; font-size: 2.4rem; color: var(--ink); display: block; }
+  .hero-stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* SECTIONS */
+  section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-header { margin-bottom: 2.5rem; }
+  .section-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.02em; color: var(--ink);
+  }
+  .section-desc { color: var(--muted); margin-top: 0.5rem; max-width: 620px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* KPI CARDS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
+  .kpi-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+  .kpi-icon { font-size: 1.4rem; margin-bottom: 0.75rem; }
+  .kpi-value { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--ink); line-height: 1; }
+  .kpi-pct { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-left: 4px; }
+  .kpi-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+  .kpi-card.danger .kpi-value { color: var(--danger); }
+  .kpi-card.success .kpi-value { color: var(--success); }
+  .kpi-card.warning .kpi-value { color: var(--warning); }
+
+  /* CHARTS */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .chart-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 1.25rem; color: var(--ink); }
+  .chart-wrap { position: relative; height: 240px; }
+  .chart-wrap.tall { height: 300px; }
+
+  /* CIDADE TABLE */
+  .cidade-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .cidade-table { width: 100%; border-collapse: collapse; }
+  .cidade-table th {
+    background: #1e3a5f; color: #ffffff; padding: 0.75rem 1rem;
+    text-align: left; font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .cidade-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.88rem; color: var(--text); }
+  .cidade-table tr:last-child td { border-bottom: none; }
+  .cidade-table tr:hover td { background: var(--bg); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 10px; border-radius: 100px; font-size: 0.78rem; font-weight: 600;
+  }
+  .badge-danger { background: rgba(220,38,38,0.15); color: var(--danger); border: 1px solid rgba(220,38,38,0.25); }
+  .badge-success { background: rgba(22,163,74,0.15); color: var(--success); border: 1px solid rgba(22,163,74,0.25); }
+  .badge-warning { background: rgba(217,119,6,0.15); color: var(--warning); border: 1px solid rgba(217,119,6,0.25); }
+  .badge-info { background: var(--accent-light); color: var(--accent); border: 1px solid rgba(79,131,247,0.2); }
+  .progress-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .progress-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width .6s; }
+
+  /* RELATOS */
+  .relatos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .relato-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.4rem;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .relato-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+  .relato-quote { font-size: 2.5rem; line-height: 1; color: var(--border); font-family: Georgia, serif; margin-bottom: 0.5rem; }
+  .relato-text { font-size: 0.88rem; color: var(--muted); line-height: 1.6; font-style: italic; margin-bottom: 1rem; }
+  .relato-author { font-weight: 600; font-size: 0.83rem; }
+  .relato-meta { font-size: 0.78rem; color: var(--muted); }
+
+  /* RECOMENDAÇÕES */
+  .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .rec-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.4rem;
+    display: flex; gap: 1rem;
+  }
+  .rec-num {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+  }
+  .rec-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .rec-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.5; }
+
+  /* PHISHING */
+  .phishing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  .phishing-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.4rem;
+    border-left: 4px solid var(--danger);
+  }
+  .phishing-icon { font-size: 1.6rem; margin-bottom: 0.6rem; }
+  .phishing-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--danger); }
+  .phishing-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.5; }
+  .phishing-tip {
+    margin-top: 0.7rem; padding: 0.6rem 0.8rem;
+    background: #fef2f2; border-radius: 6px;
+    font-size: 0.8rem; color: var(--danger); font-weight: 500;
+  }
+
+  /* GERADOR */
+  .generator-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem; max-width: 640px; margin: 0 auto;
+  }
+  .gen-output {
+    font-family: 'Courier New', monospace; font-size: 1rem;
+    background: var(--bg); border: 2px solid var(--accent);
+    border-radius: 10px; padding: 1rem 1.25rem;
+    letter-spacing: 0.03em; word-break: break-all;
+    overflow-wrap: break-word; overflow: hidden;
+    min-height: 3.5rem; display: flex; align-items: center; flex-wrap: wrap;
+    color: var(--accent); font-weight: 700; margin-bottom: 1rem;
+    cursor: pointer; transition: background .2s;
+    position: relative;
+  }
+  .gen-output:hover { background: var(--accent-light); }
+  .copy-hint { display: block; width: 100%; text-align: right; font-size: 0.72rem; color: var(--muted); font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+  .gen-controls { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+  .gen-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .gen-label { font-size: 0.85rem; color: var(--text); font-weight: 500; }
+  .gen-slider { flex: 1; accent-color: var(--accent); cursor: pointer; }
+  .gen-length-val { font-weight: 700; font-size: 0.9rem; min-width: 28px; text-align: right; color: var(--text); }
+  .gen-toggles { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .toggle-btn {
+    padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 0.8rem; cursor: pointer;
+    transition: all .15s; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  }
+  .toggle-btn.active { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+  .btn-primary {
+    width: 100%; padding: 0.85rem;
+    background: var(--accent); color: #ffffff;
+    border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: opacity .2s, transform .1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.99); }
+  .strength-bar { display: flex; gap: 4px; margin-top: 1rem; }
+  .strength-seg {
+    flex: 1; height: 4px; border-radius: 2px; background: var(--border);
+    transition: background .3s;
+  }
+  .strength-label { font-size: 0.78rem; color: var(--muted); margin-top: 6px; text-align: right; }
+  .copied-toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: #1a1a18; color: #ffffff;
+    padding: 0.7rem 1.2rem; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 500;
+    opacity: 0; transform: translateY(10px);
+    transition: all .3s; pointer-events: none; z-index: 999;
+    visibility: hidden;
+  }
+  .copied-toast.show {
+    visibility: visible;
+  }
+  .copied-toast.show { opacity: 1; transform: translateY(0); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border); padding: 2rem;
+    text-align: center; color: var(--muted); font-size: 0.82rem;
+    background: var(--surface);
+  }
+
+  @media(max-width: 640px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    section { padding: 3rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Segurança Digital 2026</span>
+  <ul class="nav-links">
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#cidades">Cidades</a></li>
+    <li><a href="#relatos">Relatos</a></li>
+    <li><a href="#phishing">Phishing</a></li>
+    <li><a href="#gerador">Gerador de Senha</a></li>
+    <li><a href="#equipe">Equipe</a></li>
+  </ul>
+  <button class="theme-toggle" id="themeToggle" title="Alternar tema" onclick="toggleTheme()">🌙</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-tag">Atividade Extensionista · 2026</span>
+  <h1>A Importância da <em>Segurança</em><br/>na Internet</h1>
+  <p>Pesquisa realizada com adultos e idosos da região de Jundiaí–SP sobre hábitos digitais, exposição a golpes e segurança de senhas.</p>
+  <div class="hero-stats">
+    <div>
+      <span class="hero-stat-num">155</span>
+      <span class="hero-stat-label">Respondentes</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">7</span>
+      <span class="hero-stat-label">Cidades</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">91%</span>
+      <span class="hero-stat-label">Expostos a golpes</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">52%</span>
+      <span class="hero-stat-label">Nunca trocam senha</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- DASHBOARD -->
+<section id="dashboard">
+  <div class="section-header">
+    <div class="section-label">Dashboard</div>
+    <h2 class="section-title">Estatísticas Gerais</h2>
+    <p class="section-desc">Visão geral dos dados coletados sobre comportamento e segurança digital dos participantes.</p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div><span class="kpi-value">155</span></div>
+      <div class="kpi-label">Total de respondentes</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-icon">⚠️</div>
+      <div><span class="kpi-value">141</span><span class="kpi-pct">91%</span></div>
+      <div class="kpi-label">Receberam mensagens suspeitas</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-icon">🔓</div>
+      <div><span class="kpi-value">27</span><span class="kpi-pct">17.4%</span></div>
+      <div class="kpi-label">Tiveram conta invadida</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-icon">🔑</div>
+      <div><span class="kpi-value">81</span><span class="kpi-pct">52%</span></div>
+      <div class="kpi-label">Nunca trocam senha</div>
+    </div>
+    <div class="kpi-card success">
+      <div class="kpi-icon">💪</div>
+      <div><span class="kpi-value">86</span><span class="kpi-pct">55%</span></div>
+      <div class="kpi-label">Usam senhas fortes</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-icon">❓</div>
+      <div><span class="kpi-value">24</span><span class="kpi-pct">15.5%</span></div>
+      <div class="kpi-label">Não sabem se foram invadidos</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Recebeu Mensagens Suspeitas?</div>
+      <div class="chart-wrap"><canvas id="chartMsg"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Conta Já Foi Invadida?</div>
+      <div class="chart-wrap"><canvas id="chartInv"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-title">Frequência de Troca de Senha</div>
+      <div class="chart-wrap tall"><canvas id="chartFreq"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Qualidade das Senhas Utilizadas</div>
+      <div class="chart-wrap"><canvas id="chartSenha"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Respondentes por Cidade</div>
+      <div class="chart-wrap"><canvas id="chartCidade"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CIDADES -->
+<section id="cidades">
+  <div class="section-header">
+    <div class="section-label">Análise Regional</div>
+    <h2 class="section-title">Dados por Cidade</h2>
+    <p class="section-desc">Comparativo de indicadores de segurança entre as 7 cidades participantes da pesquisa.</p>
+  </div>
+
+  <div class="cidade-section">
+    <table class="cidade-table">
+      <thead>
+        <tr>
+          <th>Cidade</th>
+          <th>Respondentes</th>
+          <th>Contas Invadidas</th>
+          <th>Nunca Troca Senha</th>
+          <th>Exposição a Golpes</th>
+        </tr>
+      </thead>
+      <tbody id="cidadeTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- RELATOS -->
+<section id="relatos">
+  <div class="section-header">
+    <div class="section-label">Experiências Reais</div>
+    <h2 class="section-title">Relatos dos Participantes</h2>
+    <p class="section-desc">Histórias reais compartilhadas pelos respondentes sobre tentativas de golpe e invasões.</p>
+  </div>
+  <div class="relatos-grid" id="relatosGrid"></div>
+</section>
+
+<hr class="divider"/>
+
+<!-- RECOMENDAÇÕES -->
+<section id="recomendacoes">
+  <div class="section-header">
+    <div class="section-label">Boas Práticas</div>
+    <h2 class="section-title">Recomendações de Segurança</h2>
+    <p class="section-desc">Ações concretas para melhorar a segurança digital baseadas nos dados da pesquisa.</p>
+  </div>
+  <div class="rec-grid">
+    <div class="rec-card"><div class="rec-num">1</div><div><div class="rec-title">Troque suas senhas regularmente</div><div class="rec-desc">Recomenda-se trocar senhas a cada 3 meses. Nunca reutilize a mesma senha em sites diferentes.</div></div></div>
+    <div class="rec-card"><div class="rec-num">2</div><div><div class="rec-title">Ative a verificação em dois fatores</div><div class="rec-desc">O 2FA adiciona uma camada extra de proteção. Mesmo com a senha vazada, sua conta fica protegida.</div></div></div>
+    <div class="rec-card"><div class="rec-num">3</div><div><div class="rec-title">Desconfie de links suspeitos</div><div class="rec-desc">Não clique em links recebidos por SMS, WhatsApp ou e-mail de remetentes desconhecidos ou inesperados.</div></div></div>
+    <div class="rec-card"><div class="rec-num">4</div><div><div class="rec-title">Confirme por outro canal</div><div class="rec-desc">Se alguém pede dinheiro ou dados urgentes, ligue diretamente para a pessoa ou empresa usando o número oficial.</div></div></div>
+    <div class="rec-card"><div class="rec-num">5</div><div><div class="rec-title">Use um gerenciador de senhas</div><div class="rec-desc">Ferramentas como Bitwarden ou LastPass geram e armazenam senhas fortes sem precisar memorizá-las.</div></div></div>
+    <div class="rec-card"><div class="rec-num">6</div><div><div class="rec-title">Mantenha apps e sistema atualizados</div><div class="rec-desc">Atualizações corrigem vulnerabilidades de segurança. Ative atualizações automáticas sempre que possível.</div></div></div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- PHISHING -->
+<section id="phishing">
+  <div class="section-header">
+    <div class="section-label">Guia de Proteção</div>
+    <h2 class="section-title">Como Identificar Phishing</h2>
+    <p class="section-desc">Os principais tipos de golpes digitais identificados na pesquisa e como se proteger.</p>
+  </div>
+  <div class="phishing-grid">
+    <div class="phishing-card">
+      <div class="phishing-icon">📧</div>
+      <div class="phishing-title">E-mail Falso de Banco</div>
+      <div class="phishing-desc">E-mails que imitam bancos pedindo confirmação de dados, clique em links ou download de arquivos.</div>
+      <div class="phishing-tip">✅ Bancos NUNCA pedem senha ou código por e-mail. Acesse sempre pelo app ou site oficial.</div>
+    </div>
+    <div class="phishing-card">
+      <div class="phishing-icon">📱</div>
+      <div class="phishing-title">Golpe do WhatsApp</div>
+      <div class="phishing-desc">Mensagens de "familiares em apuros" pedindo PIX urgente, ou clonagem do número para pedir dinheiro aos contatos.</div>
+      <div class="phishing-tip">✅ Sempre ligue para confirmar. Desconfie de números novos ou urgência excessiva.</div>
+    </div>
+    <div class="phishing-card">
+      <div class="phishing-icon">🛒</div>
+      <div class="phishing-title">Loja Falsa Online</div>
+      <div class="phishing-desc">Sites que imitam lojas conhecidas com preços muito abaixo do mercado para capturar dados de cartão.</div>
+      <div class="phishing-tip">✅ Verifique o endereço do site, busque avaliações e prefira lojas conhecidas.</div>
+    </div>
+    <div class="phishing-card">
+      <div class="phishing-icon">📞</div>
+      <div class="phishing-title">Ligação de "Suporte Técnico"</div>
+      <div class="phishing-desc">Golpistas ligam se passando por empresas como banco ou operadora pedindo acesso remoto ao celular/computador.</div>
+      <div class="phishing-tip">✅ Jamais dê acesso remoto ao seu dispositivo para quem ligou primeiro para você.</div>
+    </div>
+    <div class="phishing-card">
+      <div class="phishing-icon">🎰</div>
+      <div class="phishing-title">Prêmio / Sorteio Falso</div>
+      <div class="phishing-desc">Mensagens dizendo que você ganhou um prêmio e precisa pagar uma taxa ou fornecer dados para receber.</div>
+      <div class="phishing-tip">✅ Promoções legítimas nunca pedem pagamento antecipado para liberar prêmios.</div>
+    </div>
+    <div class="phishing-card">
+      <div class="phishing-icon">🏛️</div>
+      <div class="phishing-title">Falso Órgão do Governo</div>
+      <div class="phishing-desc">Ligações ou mensagens fingindo ser INSS, Receita Federal ou banco central pedindo dados ou pagamentos.</div>
+      <div class="phishing-tip">✅ Órgãos públicos não ligam pedindo senhas ou PIX. Acesse sempre pelo gov.br.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- GERADOR -->
+<section id="gerador">
+  <div class="section-header">
+    <div class="section-label">Ferramenta</div>
+    <h2 class="section-title">Gerador de Senha Forte</h2>
+    <p class="section-desc">Crie senhas seguras e únicas para proteger suas contas online.</p>
+  </div>
+
+  <div class="generator-wrap">
+    <div class="gen-output" id="genOutput" onclick="copyPassword()">
+      <span id="genText">Clique em Gerar Senha</span>
+      <span class="copy-hint">clique para copiar</span>
+    </div>
+
+    <div class="gen-controls">
+      <div class="gen-row">
+        <span class="gen-label">Comprimento</span>
+        <input type="range" class="gen-slider" id="lengthSlider" min="8" max="32" value="16" oninput="updateLength()"/>
+        <span class="gen-length-val" id="lengthVal">16</span>
+      </div>
+      <div>
+        <div class="gen-label" style="margin-bottom:0.5rem">Incluir:</div>
+        <div class="gen-toggles">
+          <button class="toggle-btn active" id="tog-upper" onclick="toggleOpt('upper')">A–Z Maiúsculas</button>
+          <button class="toggle-btn active" id="tog-lower" onclick="toggleOpt('lower')">a–z Minúsculas</button>
+          <button class="toggle-btn active" id="tog-numbers" onclick="toggleOpt('numbers')">0–9 Números</button>
+          <button class="toggle-btn active" id="tog-symbols" onclick="toggleOpt('symbols')">!@# Símbolos</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="generatePassword()">⚡ Gerar Nova Senha</button>
+
+    <div class="strength-bar" id="strengthBar">
+      <div class="strength-seg" id="s1"></div>
+      <div class="strength-seg" id="s2"></div>
+      <div class="strength-seg" id="s3"></div>
+      <div class="strength-seg" id="s4"></div>
+    </div>
+    <div class="strength-label" id="strengthLabel"></div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- EQUIPE -->
+<section id="equipe">
+  <div class="section-header">
+    <div class="section-label">Quem Fez</div>
+    <h2 class="section-title">Nossa Equipe</h2>
+    <p class="section-desc">Conheça os responsáveis pela realização desta atividade extensionista.</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar" style="background: linear-gradient(135deg,#16a34a,#22c55e)">GM</div>
+      <div class="team-name">Gustavo Matias da Silva</div>
+      <span class="team-role role-tech">🔬 Pesquisa / Tecnologia</span>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background: linear-gradient(135deg,#1d4ed8,#6366f1)">LF</div>
+      <div class="team-name">Lucas Faelis Carlos</div>
+      <span class="team-role role-comms">💬 Comunicação / Contato</span>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background: linear-gradient(135deg,#16a34a,#0d9488)">MS</div>
+      <div class="team-name">Miguel da Silva Lumiatti</div>
+      <span class="team-role role-tech">🔬 Pesquisa / Tecnologia</span>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background: linear-gradient(135deg,#1d4ed8,#3b82f6)">RC</div>
+      <div class="team-name">Rafael Candido Carracci</div>
+      <span class="team-role role-comms">💬 Comunicação / Contato</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Atividade Extensionista – A Importância da Segurança na Internet</strong></p>
+  <p style="margin-top:0.3rem">Pesquisa realizada com 155 participantes · Região de Jundiaí–SP · 2026</p>
+</footer>
+
+<div class="copied-toast" id="toast">✓ Senha copiada!</div>
+
+<script>
+// ── CHART.JS DEFAULTS ──────────────────────────────────────────────────────
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = '#7a7870';
+
+const COLORS = {
+  blue:   '#1d4ed8',
+  red:    '#dc2626',
+  amber:  '#d97706',
+  green:  '#16a34a',
+  slate:  '#64748b',
+  indigo: '#4f46e5',
+  teal:   '#0d9488',
+};
+const PALETTE = Object.values(COLORS);
+
+// Mensagens suspeitas
+new Chart(document.getElementById('chartMsg'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Sim','Não','Não sei'],
+    datasets: [{ data: [141, 10, 4], backgroundColor: [COLORS.red, COLORS.green, COLORS.amber],
+      borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { padding: 14, boxWidth: 12 } } } }
+});
+
+// Conta invadida
+new Chart(document.getElementById('chartInv'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Não','Sim','Não sei'],
+    datasets: [{ data: [104, 27, 24], backgroundColor: [COLORS.green, COLORS.red, COLORS.amber],
+      borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { padding: 14, boxWidth: 12 } } } }
+});
+
+// Frequência senha
+new Chart(document.getElementById('chartFreq'), {
+  type: 'bar',
+  data: {
+    labels: ['Nunca troco','1 vez por ano','A cada 6 meses','A cada 3 meses ou menos'],
+    datasets: [{
+      label: 'Respondentes',
+      data: [81, 38, 22, 14],
+      backgroundColor: [COLORS.red, COLORS.amber, COLORS.blue, COLORS.green],
+      borderRadius: 6, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#e8e5df' }, border: { display: false } },
+      y: { grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+
+// Qualidade senha
+new Chart(document.getElementById('chartSenha'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Senhas Fortes','Às vezes fracas','Sempre fracas'],
+    datasets: [{ data: [86, 46, 23], backgroundColor: [COLORS.green, COLORS.amber, COLORS.red],
+      borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { padding: 14, boxWidth: 12 } } } }
+});
+
+// Por cidade
+new Chart(document.getElementById('chartCidade'), {
+  type: 'bar',
+  data: {
+    labels: ['Jundiaí','Itatiba','Outros','São Paulo','Itupeva','F. Morato','F. da Rocha'],
+    datasets: [{
+      label: 'Respondentes',
+      data: [75, 27, 22, 15, 6, 6, 4],
+      backgroundColor: PALETTE,
+      borderRadius: 6, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: '#e8e5df' }, border: { display: false } },
+      x: { grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+
+// ── TABELA CIDADES ─────────────────────────────────────────────────────────
+const cidadeData = [
+  { nome: 'Jundiaí',          total: 75, invadidas: 14, nuncaTroca: 39, expostos: 70 },
+  { nome: 'Itatiba',          total: 27, invadidas:  6, nuncaTroca: 12, expostos: 25 },
+  { nome: 'Outros',           total: 22, invadidas:  4, nuncaTroca: 10, expostos: 21 },
+  { nome: 'São Paulo',        total: 15, invadidas:  2, nuncaTroca:  7, expostos: 15 },
+  { nome: 'Itupeva',          total:  6, invadidas:  1, nuncaTroca:  3, expostos:  6 },
+  { nome: 'Francisco Morato', total:  6, invadidas:  0, nuncaTroca:  2, expostos:  6 },
+  { nome: 'Franco da Rocha',  total:  4, invadidas:  0, nuncaTroca:  2, expostos:  4 },
+];
+
+const tbody = document.getElementById('cidadeTableBody');
+cidadeData.forEach(c => {
+  const pctInv  = ((c.invadidas / c.total)*100).toFixed(1);
+  const pctNunca = ((c.nuncaTroca / c.total)*100).toFixed(1);
+  const pctExp  = ((c.expostos / c.total)*100).toFixed(1);
+  const invClass = pctInv > 20 ? 'badge-danger' : pctInv > 10 ? 'badge-warning' : 'badge-success';
+  tbody.innerHTML += `
+    <tr>
+      <td><strong>${c.nome}</strong></td>
+      <td>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:${(c.total/75*100).toFixed(0)}%"></div></div>
+          <span>${c.total}</span>
+        </div>
+      </td>
+      <td><span class="badge ${invClass}">${c.invadidas} (${pctInv}%)</span></td>
+      <td><span class="badge badge-warning">${c.nuncaTroca} (${pctNunca}%)</span></td>
+      <td><span class="badge badge-danger">${c.expostos} (${pctExp}%)</span></td>
+    </tr>`;
+});
+
+// ── RELATOS ────────────────────────────────────────────────────────────────
+const relatos = [
+  { nome: 'Edivone A. S. Coatto', cidade: 'Jundiaí', idade: 68,
+    texto: 'Tive uma ligação que acabei fazendo PIX, pois pensei ser minha filha. Perdi R$ 1.820,00.' },
+  { nome: 'Erika Nakasone', cidade: 'Itatiba', idade: 55,
+    texto: 'Vários golpes por telefone, SMS, e-mails... a pior situação quase destruiu a vida da minha mãe. Ela entregou mais de 20 mil dólares a estelionatários. A sequela ficou no psicológico por mais de 10 anos.' },
+  { nome: 'Viviane Souza', cidade: 'Outros', idade: 50,
+    texto: 'Hackearam meu WhatsApp. Falaram que era do Webmotors (eu estava anunciando um carro) e me pediram um código.' },
+  { nome: 'Lidia Tsuru', cidade: 'Jundiaí', idade: 59,
+    texto: 'Tive meu cartão de crédito clonado depois de me cadastrar no aplicativo da ZUL+. Eu achava que aplicativos eram seguros.' },
+  { nome: 'Lucilene de Souza', cidade: 'Outros', idade: 43,
+    texto: 'Tenho loja online. Recebi ligação dizendo ser PagSeguro, pedindo para atualizar a máquina de cartão e o código do app. Na hora percebi e desliguei.' },
+  { nome: 'Amanda Góes', cidade: 'Jundiaí', idade: 25,
+    texto: 'Criaram um WhatsApp usando minha foto e enviaram mensagens para conhecidos pedindo dinheiro. O golpista disse para não deixar o Facebook aberto para evitar que vejam minha lista de amigos.' },
+  { nome: 'Rita Ivone Lopes', cidade: 'Jundiaí', idade: 70,
+    texto: 'Fizeram pix em meu nome. Usaram minha senha, nunca a compartilhei com ninguém. Mesmo com BO na delegacia não fui ressarcida pelo banco.' },
+  { nome: 'Arlete Gianulo', cidade: 'Itatiba', idade: null,
+    texto: 'Vi um anúncio das Lojas Americanas ofertando um produto, comprei e era golpe. Pegaram o número do meu cartão e compraram uma passagem aérea. Fui ao banco e à polícia e consegui receber meu dinheiro.' },
+  { nome: 'Jefferson H. Pinheiro', cidade: 'Jundiaí', idade: 46,
+    texto: 'Logaram meu Gmail em um celular em outra cidade.' },
+];
+
+const grid = document.getElementById('relatosGrid');
+relatos.forEach(r => {
+  grid.innerHTML += `
+    <div class="relato-card">
+      <div class="relato-quote">"</div>
+      <p class="relato-text">${r.texto}</p>
+      <div class="relato-author">${r.nome}</div>
+      <div class="relato-meta">${r.cidade}${r.idade ? ' · ' + r.idade + ' anos' : ''}</div>
+    </div>`;
+});
+
+// ── GERADOR DE SENHA ───────────────────────────────────────────────────────
+const opts = { upper: true, lower: true, numbers: true, symbols: true };
+const chars = {
+  upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  lower: 'abcdefghijklmnopqrstuvwxyz',
+  numbers: '0123456789',
+  symbols: '!@#$%^&*()-_=+[]{}|;:,.<>?'
+};
+
+function updateLength() {
+  const v = document.getElementById('lengthSlider').value;
+  document.getElementById('lengthVal').textContent = v;
+}
+
+function toggleOpt(key) {
+  const active = Object.values(opts).filter(Boolean).length;
+  if (opts[key] && active === 1) return;
+  opts[key] = !opts[key];
+  document.getElementById('tog-' + key).classList.toggle('active', opts[key]);
+  if (document.getElementById('genText').textContent !== 'Clique em Gerar Senha') generatePassword();
+}
+
+function generatePassword() {
+  const len = parseInt(document.getElementById('lengthSlider').value);
+  let pool = '';
+  let password = '';
+  // Garantir pelo menos 1 de cada tipo ativo
+  Object.entries(opts).forEach(([k, v]) => { if (v) { pool += chars[k]; password += chars[k][Math.floor(Math.random()*chars[k].length)]; }});
+  while (password.length < len) password += pool[Math.floor(Math.random()*pool.length)];
+  password = password.split('').sort(()=>Math.random()-0.5).join('').slice(0, len);
+  document.getElementById('genText').textContent = password;
+  updateStrength(password);
+}
+
+function updateStrength(pwd) {
+  let score = 0;
+  if (pwd.length >= 12) score++;
+  if (pwd.length >= 16) score++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+  const level = score <= 2 ? 1 : score <= 3 ? 2 : score <= 4 ? 3 : 4;
+  const colors = ['', '#dc2626','#d97706','#2e75b6','#16a34a'];
+  const labels = ['', 'Fraca','Razoável','Boa','Muito Forte'];
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('s'+i).style.background = i <= level ? colors[level] : '#e8e5df';
+  }
+  document.getElementById('strengthLabel').textContent = labels[level];
+  document.getElementById('strengthLabel').style.color = colors[level];
+}
+
+function copyPassword() {
+  const pwd = document.getElementById('genText').textContent;
+  if (pwd === 'Clique em Gerar Senha') return;
+  navigator.clipboard.writeText(pwd).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// Gera uma senha ao carregar
+window.addEventListener('load', generatePassword);
+
+// ── TEMA ───────────────────────────────────────────────────────────────────
+const html = document.documentElement;
+const btn  = document.getElementById('themeToggle');
+
+function getSystemTheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  html.setAttribute('data-theme', theme);
+  btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+  const current = html.getAttribute('data-theme') || getSystemTheme();
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Ao carregar: respeita preferência salva ou usa o sistema
+(function() {
+  const saved = localStorage.getItem('theme');
+  applyTheme(saved || getSystemTheme());
+  // Observa mudanças no tema do sistema
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+  });
+})();
+</script>
+</body>
+</html>
