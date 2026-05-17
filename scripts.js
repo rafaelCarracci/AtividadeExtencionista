@@ -18,7 +18,7 @@ new Chart(document.getElementById('chartMsg'), {
   type: 'doughnut',
   data: {
     labels: ['Sim','Não','Não sei'],
-    datasets: [{ data: [141, 10, 4], backgroundColor: ['#e11d48', '#8b5cf6', '#f97316'],
+    datasets: [{ data: [141, 10, 4], backgroundColor: ['#21824d', '#8b5cf6', '#f97316'],
       borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }]
   },
   options: { responsive: true, maintainAspectRatio: false, cutout: '65%',
@@ -71,7 +71,7 @@ new Chart(document.getElementById('chartSenha'), {
     plugins: { legend: { position: 'bottom', labels: { padding: 14, boxWidth: 12 } } } }
 });
 
-// Por cidade
+// Respondentes Por cidade
 new Chart(document.getElementById('chartCidade'), {
   type: 'bar',
   data: {
