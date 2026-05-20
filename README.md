@@ -108,5 +108,6 @@ AtividadeExtencionista/
 </div>
 
 ---
-📜 Licença
-Este projeto foi desenvolvido para fins acadêmicos e educacionais.
+## 📜 Licença
+
+### Este projeto foi desenvolvido para fins acadêmicos e educacionais.
