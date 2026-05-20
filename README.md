@@ -101,8 +101,10 @@ AtividadeExtencionista/
 
 | Nome | GitHub | LinkedIn |
 |------|--------|----------|
-| 👨‍💻 Rafael Carracci | [@rafaelCarracci](https://github.com/rafaelCarracci) | — |
 | 👨‍💻 Gustavo Matias Silva | [@gus-ms](https://github.com/gus-ms) | [gustavomatiassilva](https://www.linkedin.com/in/gustavomatiassilva/) |
+| 👨‍💻 Lucas Faelis Carlos | [@Khaosxxx](https://github.com/Khaosxxx) | [lucas-faelis-carlos](https://www.linkedin.com/in/lucas-faelis-carlos/)
+| 👨‍💻 Miguel da Silva Lumiatti | - | - |
+| 👨‍💻 Rafael Carracci | [@rafaelCarracci](https://github.com/rafaelCarracci) | — |
 
 </div>
 
