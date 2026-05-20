@@ -96,10 +96,9 @@ AtividadeExtencionista/
 ---
 
 👨‍💻 Autores
-<div align="center">
-👨‍💻	Rafael Carracci	| @rafaelCarracci | 
-👨‍💻	Gustavo Matias Silva |	@gus-ms |	https://linkedin.com/in/gustavomatiassilva/
-</div>
+
+### 👨‍💻	Rafael Carracci	| @rafaelCarracci | 
+### 👨‍💻	Gustavo Matias Silva |	@gus-ms |	https://linkedin.com/in/gustavomatiassilva/
 ---
 
 📜 Licença
