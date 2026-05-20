@@ -66,7 +66,7 @@ Boas práticas para proteção de contas e dados pessoais.
 Exemplos práticos de golpes e como identificá-los.
 
 ### 🔐 Gerador de Senhas Fortes
-Ferramenta para criar senhas seguras e personalizadas.
+Ferramenta para criar senhas seguras e personalizadas para confortar o usuário.
 
 ---
 
